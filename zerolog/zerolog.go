@@ -8,7 +8,8 @@ import (
 )
 
 type Writer interface {
-	Write(loginId string, ticketingId string, stepName string, message string)
+	// Write(loginId string, ticketingId string, stepName string, message string)
+	Write(appName string, goodsCode string, loginId string, ticketingId string, stepName string, message string)
 }
 
 type Event struct {
@@ -26,7 +27,7 @@ func (e *Event) Step(step string) *Event {
 func (e *Event) Msg(msg string) {
 	e.MsgValue = msg
 	// println(msg)
-	e.l.w.Write(e.l.c.LoginId, e.l.c.TkId, e.StepValue, e.MsgValue)
+	e.l.w.Write(e.l.c.AppName, e.l.c.GoodsCode, e.l.c.LoginId, e.l.c.TkId, e.StepValue, e.MsgValue)
 }
 
 func (e *Event) MsgArr(a ...interface{}) {
@@ -49,7 +50,7 @@ func (e *Event) MsgArr(a ...interface{}) {
 	}
 
 	e.MsgValue = strings.TrimSuffix(b.String(), " | ")
-	e.l.w.Write(e.l.c.LoginId, e.l.c.TkId, e.StepValue, e.MsgValue)
+	e.l.w.Write(e.l.c.AppName, e.l.c.GoodsCode, e.l.c.LoginId, e.l.c.TkId, e.StepValue, e.MsgValue)
 }
 
 // func (e *Event) Str(key, val string) *Event {
@@ -84,7 +85,7 @@ type Logger struct {
 }
 
 func (l Logger) With() Context {
-	l.c = &Context{&l, "", ""}
+	l.c = &Context{&l, "", "", "", ""}
 	return *l.c
 }
 
@@ -102,14 +103,26 @@ func (l *Logger) Log() *Event {
 
 type Context struct {
 	// contains filtered or unexported fields
-	l       *Logger
-	LoginId string
-	TkId    string
+	l         *Logger
+	AppName   string
+	GoodsCode string
+	LoginId   string
+	TkId      string
 }
 
 func (c Context) Logger() Logger {
 	c.l.c = &c
 	return *c.l
+}
+
+func (c Context) SetAppName(appName string) Context {
+	c.AppName = appName
+	return c
+}
+
+func (c Context) SetGoodsCode(goodsCode string) Context {
+	c.GoodsCode = goodsCode
+	return c
 }
 
 func (c Context) SetLoginId(loginId string) Context {

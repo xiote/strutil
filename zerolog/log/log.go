@@ -10,11 +10,13 @@ type StderrWriter struct {
 	//
 }
 
-func (w StderrWriter) Write(loginId string, ticketingId string, stepName string, message string) {
+func (w StderrWriter) Write(appName string, goodsCode string, loginId string, ticketingId string, stepName string, message string) {
 
 	// fmt.Fprintln(os.Stderr, "hello world")
 
 	go println(fmt.Sprintf("%s | %s | %s | %s | %s",
+		appName,
+		goodsCode,
 		loginId,
 		ticketingId,
 		// realClock.Now().Format("0102_15:04:05.000"),
