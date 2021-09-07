@@ -3,15 +3,40 @@ package httputil
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"time"
+
+	"github.com/pkg/errors"
+
 	log "github.com/xiote/go-utils/chanlog"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/text/encoding/korean"
 	tf "golang.org/x/text/transform"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"time"
 )
+
+func GetCookieValue(jar http.CookieJar, rawUrl string, cookieName string) (value string, err error) {
+
+	u, err := url.Parse(rawUrl)
+	if err != nil {
+		err = errors.Wrap(err, "Parse failed")
+		return
+	}
+
+	for _, cookie := range jar.Cookies(u) {
+		if cookie.Name == cookieName {
+			value = cookie.Value
+			return
+		}
+	}
+
+	err = errors.Wrap(err, fmt.Sprintf("%s is  not found!", cookieName))
+	return
+
+}
 
 func EuckrDo2(client *http.Client, req *http.Request, nameforlog string) (respdate time.Time, src string, err error) {
 	// var starttime time.Time
